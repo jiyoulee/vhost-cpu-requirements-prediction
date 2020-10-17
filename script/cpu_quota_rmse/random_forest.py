@@ -25,25 +25,25 @@ test_X_ppr = min_max_scalar.transform(test_X)
 train_y_ppr = min_max_scalar.fit_transform(train_y.reshape(-1, 1))
 test_y_ppr = min_max_scalar.transform(test_y.reshape(-1, 1))
 
-# # Cross validate
-# n_estimators = list(range(100, 1000, 10))
-# max_features = [1, 2, 3, 4, 5]
-# min_samples_split = [2, 5, 10]
-# min_samples_leaf = [1, 2, 4]
-# random_grid = {'n_estimators': n_estimators,
-#                'max_features': max_features,
-#                'min_samples_split': min_samples_split,
-#                'min_samples_leaf': min_samples_leaf}
-#
-# clf = RandomForestRegressor(random_state=40)
-# clf_random_cv = RandomizedSearchCV(estimator=clf, param_distributions=random_grid, n_iter=100, cv=5, scoring='neg_root_mean_squared_error', verbose=2, n_jobs=-1, random_state=40)
-# clf_random_cv.fit(train_X_ppr, train_y_ppr.ravel())
-#
-# # Save model
-# joblib.dump(clf_random_cv, "../../model/cpu_quota/" + model_name)
+# Cross validate
+n_estimators = list(range(100, 1000, 10))
+max_features = [1, 2, 3, 4, 5]
+min_samples_split = [2, 5, 10]
+min_samples_leaf = [1, 2, 4]
+random_grid = {'n_estimators': n_estimators,
+               'max_features': max_features,
+               'min_samples_split': min_samples_split,
+               'min_samples_leaf': min_samples_leaf}
+
+clf = RandomForestRegressor(random_state=40)
+clf_random_cv = RandomizedSearchCV(estimator=clf, param_distributions=random_grid, n_iter=100, cv=5, scoring='neg_root_mean_squared_error', verbose=2, n_jobs=-1, random_state=40)
+clf_random_cv.fit(train_X_ppr, train_y_ppr.ravel())
+
+# Save model
+joblib.dump(clf_random_cv, "../../model/cpu_quota_rmse/" + model_name)
 
 # Test
-clf = joblib.load("../../model/cpu_quota/" + model_name)
+clf = joblib.load("../../model/cpu_quota_rmse/" + model_name)
 pred_y_ppr = clf.predict(test_X_ppr)
 pred_y = min_max_scalar.inverse_transform(pred_y_ppr.reshape(-1, 1))
 
@@ -51,7 +51,7 @@ pred_y = min_max_scalar.inverse_transform(pred_y_ppr.reshape(-1, 1))
 score = mean_squared_error(test_y, pred_y, squared=False)
 
 # Save
-wb = load_workbook('../../data/cpu_quota.xlsx')
+wb = load_workbook('../../data/cpu_quota_rmse.xlsx')
 
 ws = wb["results"]
 ws.cell(3, 8).value = model_name
@@ -65,4 +65,4 @@ for j in range(100):
 for j in range(100):
     ws.cell(j+2, 2).value = test_y[j]
 
-wb.save('C:/Users/Jiyou/Desktop/github.com/ksc-2020/data/cpu_quota.xlsx')
+wb.save('C:/Users/Jiyou/Desktop/github.com/ksc-2020/data/cpu_quota_rmse.xlsx')
